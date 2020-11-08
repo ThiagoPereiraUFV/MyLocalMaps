@@ -33,7 +33,7 @@
         <!-- NECESSÁRIO ADICIONAR ESSA CONFIGURAÇÃO PARA INFORMAR A VERSÃO DO GOOGLE PLAY SERVICES UTILIZADA PARA COMPILAR O APP -->
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="49" />
+            android:value="@integer/google_play_services_version" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
