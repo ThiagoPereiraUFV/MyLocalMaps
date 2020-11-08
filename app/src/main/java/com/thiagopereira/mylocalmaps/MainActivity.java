@@ -40,6 +40,7 @@ public class MainActivity extends ListActivity {
 				break;
 			case "Fechar aplicação":
 				finish();
+				return;
 		}
 
 		startActivity(it);

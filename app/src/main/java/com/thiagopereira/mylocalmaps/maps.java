@@ -2,17 +2,20 @@ package com.thiagopereira.mylocalmaps;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,16 +27,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class maps extends FragmentActivity implements OnMapReadyCallback {
-	private final LatLng VICOSA = new LatLng(-20.752946, -42.879097);
-	private final LatLng NATAL = new LatLng(-21.12881, -42.374247);
-	private final LatLng DPTO = new LatLng(-21.109725, -42.381738);
+public class maps extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+	private final LatLng VICOSA = new LatLng(-20.7589588, -42.8910717);
+	private final LatLng NATAL = new LatLng(-23.7715005, -46.6898259);
+	private final LatLng DPTO = new LatLng(-20.764977, -42.8706477);
 	private GoogleMap map;
+	private Location location;
 	public LocationManager lm;
 	public Criteria criteria;
 	public String provider;
 	public int TEMPO_REQUISICAO_LATLONG = 5000;
 	public int DISTANCIA_MIN_METROS = 0;
+	public static final int LOCATION_PERMISSION = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,19 +75,47 @@ public class maps extends FragmentActivity implements OnMapReadyCallback {
 		} else {
 			Log.i("PROVEDOR", "Está sendo utilizado o provedor: " + provider);
 
-			//Obtem atualizações de posição
-			if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-				// TODO: Consider calling
-				//    ActivityCompat#requestPermissions
-				// here to request the missing permissions, and then overriding
-				//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-				//                                          int[] grantResults)
-				// to handle the case where the user grants the permission. See the documentation
-				// for ActivityCompat#requestPermissions for more details.
-				return;
+			if ((ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+					(ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+
+				// verifica se precisa explicar para o usuário a necessidade da permissão
+				if ((ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) ||
+						(ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_COARSE_LOCATION))) {
+
+					//explica para o usuário a necessidade da permissão caso ele já tenha negado pelo menos uma vez
+					Toast.makeText(getBaseContext(),"Permita o uso do serviço de localização para rastrear este aparelho!",Toast.LENGTH_LONG).show();
+
+					//pede permissão
+					ActivityCompat.requestPermissions(this,
+							new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+							LOCATION_PERMISSION);
+
+					Log.i("PERMISSION","Devo dar explicação");
+
+				} else {
+
+					// Pede a permissão direto a primeira vez que o usuário tentar usar o recurso.
+					ActivityCompat.requestPermissions(this,
+							new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+							LOCATION_PERMISSION);
+
+					Log.i("PERMISSION","Pede a permissão");
+					// LOCATION_PERMISSION é uma constante declarada para ser usada no callback da resposta da permissão
+				}
+			} else {
+				Log.i("PERMISSION","Já tenho essa permissão");
 			}
 			lm.requestLocationUpdates(provider, TEMPO_REQUISICAO_LATLONG, DISTANCIA_MIN_METROS, (LocationListener) this);
+			location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		//interrompe o Location Manager
+		lm.removeUpdates((LocationListener) this);
+		Log.w("PROVEDOR","Provedor " + provider + " parado!");
+		super.onDestroy();
 	}
 
 	@Override
@@ -119,6 +152,11 @@ public class maps extends FragmentActivity implements OnMapReadyCallback {
 		map.animateCamera(update);
 	}
 
+	@Override
+	public void onLocationChanged(Location location) {
+		this.location = location;
+	}
+
 	public void setLocal(View v) {
 		final String tag = v.getTag().toString();
 
@@ -138,8 +176,9 @@ public class maps extends FragmentActivity implements OnMapReadyCallback {
 				local = DPTO;
 				break;
 			case "local":
+				local = new LatLng(location.getLatitude(), location.getLongitude());
 				map.addMarker(new MarkerOptions()
-					.position(VICOSA).title("AP")
+					.position(local).title("Minha localização atual")
 					.snippet("Aqui")
 					.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 				break;
