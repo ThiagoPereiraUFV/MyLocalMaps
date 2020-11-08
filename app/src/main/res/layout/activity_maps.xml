@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:onClick=""
+        android:onClick="setLocal"
+        android:tag="natal"
         android:text="Natal" />
 
     <Button
@@ -22,7 +23,8 @@
         app:layout_constraintTop_toTopOf="@id/btnNatal"
         app:layout_constraintLeft_toRightOf="@id/btnNatal"
         app:layout_constraintRight_toLeftOf="@id/btnDepto"
-        android:onClick=""
+        android:onClick="setLocal"
+        android:tag="vicosa"
         android:text="Viçosa" />
 
     <Button
@@ -31,25 +33,35 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/btnNatal"
         app:layout_constraintRight_toRightOf="parent"
-        android:onClick=""
+        android:onClick="setLocal"
+        android:tag="depto"
         android:text="Departamento" />
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        app:layout_constraintTop_toBottomOf="@id/btnNatal"
-    />
-
-    <Button
-        android:id="@+id/btnLoc"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/map"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:onClick=""
-        android:text="Localização" />
+        app:layout_constraintTop_toBottomOf="@id/btnNatal">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.914"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <Button
+            android:id="@+id/btnLoc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/map"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:onClick="setLocal"
+            android:tag="local"
+            android:text="Localização" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,13 +3,20 @@ package com.thiagopereira.mylocalmaps;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+
 public class MainActivity extends ListActivity {
+	private final LatLng VICOSA = new LatLng(-20.752946, -42.879097);
+	private final LatLng NATAL = new LatLng(-21.12881, -42.374247);
+	private final LatLng DPTO = new LatLng(-21.109725, -42.381738);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,5 +44,9 @@ public class MainActivity extends ListActivity {
 			case "Fechar aplicação":
 				finish();
 		}
+
+		final Intent it = new Intent(getBaseContext(), maps.class);
+		startActivity(it);
+		finish();
 	}
 }
